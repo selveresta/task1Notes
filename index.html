@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Notes App</title>
+		<link rel="stylesheet" href="style.css" />
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+
+	</head>
+	<body>
+
+
+        <!-- Modal for Create New Note -->
+        <div class="modal fade" id="Modal" tabindex="-1" aria-labelledby="ModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="ModalLabel">Create New Note</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form onsubmit="createNewNote()">
+                        <div class="mb-3">
+                          <labelame for="inputName" class="form-label">Name</label>
+                          <input type="email" class="form-control" id="inputName" aria-describedby="emailHelp">
+                        </div>
+                        <div class="mb-3">
+                          <label for="selectType" class="form-label">Category</label>
+                          <select class="form-select" aria-label="Choose type" id="selectType">
+                            
+                            <option value="1">Task</option>
+                            <option value="2">Idea</option>
+                            <option value="3">Random Thought</option>
+                          </select>
+                        </div>
+                        <div class="form-floating">
+
+                            <textarea class="form-control" id="content" placeholder="Leave a content here" id="floatingTextarea"></textarea>
+                            <label for="floatingTextarea">Content</label>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="submit"  id="createNoteBtn" type="button" class="btn btn-primary" >Create</button>
+                          </div>
+                      </form>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+
+          <div class="modal fade" id="EditModal" tabindex="-1" aria-labelledby="EditModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="EditModalLabel">Create New Note</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form onsubmit="">
+                        <div class="mb-3">
+                          <labelame for="inputName" class="form-label">Name</label>
+                          <input type="email" class="form-control" id="EditInputName" aria-describedby="emailHelp">
+                        </div>
+                        <div class="mb-3">
+                          <label for="selectType" class="form-label">Category</label>
+                          <select class="form-select" aria-label="Choose type" id="EditSelectType">
+                            
+                            <option value="1">Task</option>
+                            <option value="2">Idea</option>
+                            <option value="3">Random Thought</option>
+                          </select>
+                        </div>
+                        <div class="form-floating">
+
+                            <textarea class="form-control" id="EditContent" placeholder="Leave a content here" id="floatingTextarea"></textarea>
+                            <label for="floatingTextarea">Content</label>
+                          </div>
+                        
+                      </form>
+                </div>
+                <div class="modal-footer">
+                  <button id="SaveNoteBtn" type="button" class="btn btn-primary">Save</button>
+                </div>
+              </div>
+            </div>
+            </div>
+
+
+
+		<h1 style="text-align: center;">Notes App</h1>
+
+		<h2>Notes</h2>
+		<table id="notesTable">
+			<thead>
+				<tr>
+					<th></th>
+					<th>Time of Creation</th>
+					<th>Note Content</th>
+					<th>Note Category</th>
+					<th>Dates Mentioned</th>
+					<th>Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				<!-- Note entries will be inserted here -->
+			</tbody>
+		</table>
+
+		<hr />
+		<button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#Modal">Add New Note</button>
+		<hr />
+		<h2 style="text-align: center;">Summary</h2>
+		<table id="summaryTable">
+			<thead>
+				<tr>
+					<th>Category</th>
+					<th>Active Notes</th>
+					<th>Archived Notes</th>
+				</tr>
+			</thead>
+			<tbody>
+				<!-- Summary entries will be inserted here -->
+			</tbody>
+		</table>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8" crossorigin="anonymous"></script>
+
+		<script src="script.js"></script>
+	</body>
+</html>

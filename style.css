@@ -1,0 +1,39 @@
+.buttonPanel {
+	text-align: end;
+	padding: 15px;
+	margin: 15px;
+}
+button {
+	border: 1px solid black;
+}
+
+table {
+	font-family: arial, sans-serif;
+	border-collapse: collapse;
+	width: 100%;
+	padding: 10px;
+}
+
+td,
+th,
+tr {
+	text-align: center;
+	padding: 15px;
+}
+
+td {
+	background-color: beige;
+}
+
+th {
+	background-color: darkgray;
+	color: white;
+}
+
+th {
+	border-bottom: 30px solid white;
+}
+
+tr {
+	border-bottom: solid white 10px;
+}
