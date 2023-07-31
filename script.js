@@ -1,8 +1,8 @@
-// Sample data with prepopulated notes
 let notesData = [
 	{
 		id: 1,
 		createdAt: new Date("2023-07-25"),
+		name: "Name1",
 		content: "I'm gonna have a dentist appointment on the 3/5/2021, I moved it from 5/5/2021",
 		category: "Task",
 		img: "./icons/task.png",
@@ -10,6 +10,7 @@ let notesData = [
 	{
 		id: 2,
 		createdAt: new Date("2023-07-25"),
+		name: "Name2",
 		content: "from  7/10/2022, I moved it from 8/10/2022",
 		category: "Task",
 		img: "./icons/task.png",
@@ -17,6 +18,7 @@ let notesData = [
 	{
 		id: 3,
 		createdAt: new Date("2023-07-25"),
+		name: "Name3",
 		content: "on the 3/5/2021, I moved",
 		category: "Idea",
 		img: "./icons/idea.png",
@@ -24,6 +26,7 @@ let notesData = [
 	{
 		id: 4,
 		createdAt: new Date("2023-07-26"),
+		name: "Name4",
 		content: "This is a random thought.",
 		category: "Random Thought",
 		img: "./icons/RT.png",
@@ -31,6 +34,7 @@ let notesData = [
 	{
 		id: 5,
 		createdAt: new Date("2023-07-26"),
+		name: "Name5",
 		content: "This is a random thought.",
 		category: "Random Thought",
 		img: "./icons/RT.png",
@@ -39,6 +43,7 @@ let notesData = [
 	{
 		id: 6,
 		createdAt: new Date("2023-07-26"),
+		name: "Name61",
 		content: "This is a random thought.",
 		category: "Random Thought",
 		img: "./icons/RT.png",
@@ -46,6 +51,7 @@ let notesData = [
 	{
 		id: 7,
 		createdAt: new Date("2023-07-27"),
+		name: "Name16",
 		content: "I have a great idea!",
 		category: "Idea",
 		img: "./icons/idea.png",
@@ -55,7 +61,6 @@ let notesData = [
 
 let archiveData = [];
 
-// Function to render the notes table
 function renderNotesTable() {
 	const notesTableBody = document.querySelector("#notesTable tbody");
 	notesTableBody.innerHTML = "";
@@ -64,12 +69,13 @@ function renderNotesTable() {
 		const row = document.createElement("tr");
 		row.innerHTML = `
         <td><img src=${note.img} style="width:30px;height:30px;" /></td>
+        <td>${note.name}</td>
         <td>${note.createdAt.toLocaleDateString()}</td>
         <td>${note.content}</td>
         <td>${note.category}</td>
         <td>${getDatesFromContent(note.content)}</td>
         <td>
-          <button onclick="editNote(${note.id})">Edit</button>
+          <button data-bs-toggle="modal" data-bs-target="#EditModal" onclick="openEditNote(${note.id})">Edit</button>
           <button onclick="archiveNote(${note.id})">Archive</button>
           <button onclick="removeNotefromNotes(${note.id})">Remove</button>
         </td>
@@ -86,12 +92,13 @@ function renderArchiveTable() {
 		const row = document.createElement("tr");
 		row.innerHTML = `
         <td><img src=${note.img} style="width:30px;height:30px;" /></td>
+        <td>${note.name}</td>
         <td>${note.createdAt.toLocaleDateString()}</td>
         <td>${note.content}</td>
         <td>${note.category}</td>
         <td>${getDatesFromContent(note.content)}</td>
         <td>
-          <button onclick="editNote(${note.id})">Edit</button>
+          <button data-bs-toggle="modal" data-bs-target="#EditModal" onclick="openEditArchive(${note.id})">Edit</button>
           <button onclick="undoNote(${note.id})">Undo</button>
           <button onclick="removeNotefromArchive(${note.id})">Remove</button>
         </td>
@@ -132,7 +139,6 @@ function renderSummaryTable() {
 	});
 }
 
-// Function to create a new note
 function createNewNote(event) {
 	event.preventDefault();
 	let index;
@@ -143,20 +149,23 @@ function createNewNote(event) {
 	}
 	const name = document.getElementById("inputName");
 	const type = document.getElementById("selectType");
+	let typeStr = type.options[type.selectedIndex].text;
+
 	const content = document.getElementById("content");
 	const typeval = type.value;
 	if (name.value && type.value && content.value) {
 		const noteElement = {
 			id: index,
 			createdAt: new Date(Date.now()),
+			name: name.value,
 			content: content.value,
-			category: type.value,
+			category: typeStr,
 			img:
-				type.value === 1
+				typeStr === "Task"
 					? "./icons/task.png"
-					: type.value === 2
+					: typeStr === "Idea"
 					? "./icons/idea.png"
-					: (type.value = 3 ? "./icons/RT.png" : "./icons/idea.png"),
+					: (typeStr = "Random Thought" ? "./icons/RT.png" : "./icons/idea.png"),
 		};
 		notesData.push(noteElement);
 	}
@@ -166,14 +175,70 @@ function createNewNote(event) {
 	type.value = typeval;
 }
 
-// Function to edit a note
-function editNote(noteId) {
-	// Implement code to find the note with the given ID and prompt the user for updated content and category
-	// Update the note in the notesData array and call renderNotesTable() and renderSummaryTable() to update the tables
+//   Function to edit a note
+function editNote(event) {
+	event.preventDefault();
+	const name = document.getElementById("EditInputName");
+	const type = document.getElementById("EditSelectType");
+	const content = document.getElementById("EditContent");
+	const editIdDiv = document.getElementById("editId");
+	const noteId = Number(editIdDiv.innerText);
+	let typeStr = type.options[type.selectedIndex].text;
+
+	let note = notesData.filter((value) => {
+		return value.id === noteId;
+	})[0];
+
+	if (!note) {
+		note = archiveData.filter((value) => {
+			return value.id === noteId;
+		})[0];
+	}
+
+	note.name = name.value;
+	note.category = typeStr;
+	note.content = content.value;
+	note.img =
+		typeStr === "Task"
+			? "./icons/task.png"
+			: typeStr === "Idea"
+			? "./icons/idea.png"
+			: (typeStr = "Random Thought" ? "./icons/RT.png" : "./icons/idea.png");
+	renderNotesTable();
+	renderSummaryTable();
+	renderArchiveTable();
 }
 
-// Function to archive a note
-function archiveNote(noteId) {
+function openEditNote(noteId) {
+	const name = document.getElementById("EditInputName");
+	const type = document.getElementById("EditSelectType");
+	const content = document.getElementById("EditContent");
+	const editIdDiv = document.getElementById("editId");
+	editIdDiv.innerText = String(noteId);
+	const note = notesData.filter((value) => {
+		return value.id === noteId;
+	})[0];
+	name.value = note.name;
+	type.value = note.category;
+	content.value = note.content;
+}
+
+function openEditArchive(noteId) {
+	const name = document.getElementById("EditInputName");
+	const type = document.getElementById("EditSelectType");
+	const content = document.getElementById("EditContent");
+	const editIdDiv = document.getElementById("editId");
+	editIdDiv.innerText = String(noteId);
+	const note = archiveData.filter((value) => {
+		return value.id === noteId;
+	})[0];
+	name.value = note.name;
+	type.value = note.category;
+	content.value = note.content;
+}
+
+//   Function to archive a note
+const archiveNote = (noteId) => {
 	const note = notesData.filter((val) => {
 		return val.id === noteId;
 	})[0];
@@ -184,7 +249,7 @@ function archiveNote(noteId) {
 	renderNotesTable();
 	renderSummaryTable();
 	renderArchiveTable();
-}
+};
 
 function undoNote(noteId) {
 	const note = archiveData.filter((val) => {
@@ -218,7 +283,11 @@ function removeNotefromArchive(noteId) {
 
 const addForm = document.getElementById("addForm");
 addForm.addEventListener("submit", createNewNote);
-// Initial rendering
+
+const edirform = document.getElementById("editForm");
+
+edirform.addEventListener("submit", editNote);
+
 renderNotesTable();
 renderSummaryTable();
 renderArchiveTable();
