@@ -1,71 +1,14 @@
-import {
-	openEditNote,
-	archiveNote,
-	createNewNote,
-	editNote,
-	openEditArchive,
-	undoNote,
-	removeNotefromNotes,
-	removeNotefromArchive,
-} from "./actions.js";
-import { notesData, archiveData } from "./actions.js";
+import { openEditNote, archiveNote, undoNote, removeNote } from "./actions.js";
+import { notesData } from "./data.js";
 
 export function renderNotesTable() {
 	const notesTableBody = document.querySelector("#notesTable tbody");
 	notesTableBody.innerHTML = "";
-
-	notesData.forEach((note) => {
-		const row = document.createElement("tr");
-		const btn1 = document.createElement("button");
-		const btn2 = document.createElement("button");
-		const btn3 = document.createElement("button");
-
-		const td1 = document.createElement("td");
-		td1.innerHTML = `<img src=${note.img} style="width:30px;height:30px;" />`;
-		const td2 = document.createElement("td");
-		td2.innerHTML = `${note.name}`;
-
-		const td3 = document.createElement("td");
-		td3.innerHTML = `${note.createdAt.toLocaleDateString()}`;
-
-		const td4 = document.createElement("td");
-		td4.innerHTML = `${note.content}`;
-
-		const td5 = document.createElement("td");
-		td5.innerHTML = `${note.category}`;
-
-		const td6 = document.createElement("td");
-		td6.innerHTML = `${getDatesFromContent(note.content)}`;
-
-		btn1.addEventListener("click", () => {
-			openEditNote(note.id);
-		});
-		btn1.setAttribute("data-bs-toggle", "modal");
-		btn1.setAttribute("data-bs-target", "#EditModal");
-		btn1.innerText = "Edit";
-		btn2.addEventListener("click", () => {
-			archiveNote(note.id);
-		});
-		btn2.innerText = "Archive";
-
-		btn3.addEventListener("click", () => {
-			removeNotefromNotes(note.id);
-		});
-		btn3.innerText = "Remove";
-
-		const td7 = document.createElement("td");
-		td7.append(btn1);
-		td7.append(btn2);
-		td7.append(btn3);
-
-		row.append(td1);
-		row.append(td2);
-		row.append(td3);
-		row.append(td4);
-		row.append(td5);
-		row.append(td6);
-		row.append(td7);
-
+	const notes = notesData.filter((value) => {
+		return value.archived === false;
+	});
+	notes.forEach((note) => {
+		const row = createRow(note, false);
 		notesTableBody.appendChild(row);
 	});
 }
@@ -73,59 +16,59 @@ export function renderNotesTable() {
 export function renderArchiveTable() {
 	const notesTableBody = document.querySelector("#archiveTable tbody");
 	notesTableBody.innerHTML = "";
-
-	archiveData.forEach((note) => {
-		const row = document.createElement("tr");
-		const btn1 = document.createElement("button");
-		const btn2 = document.createElement("button");
-		const btn3 = document.createElement("button");
-
-		const td1 = document.createElement("td");
-		td1.innerHTML = `<img src=${note.img} style="width:30px;height:30px;" />`;
-
-		const td2 = document.createElement("td");
-		td2.innerHTML = `${note.name}`;
-
-		const td3 = document.createElement("td");
-		td3.innerHTML = `${note.createdAt.toLocaleDateString()}`;
-
-		const td4 = document.createElement("td");
-		td4.innerHTML = `${note.content}`;
-
-		const td5 = document.createElement("td");
-		td5.innerHTML = `${note.category}`;
-
-		const td6 = document.createElement("td");
-		td6.innerHTML = `${getDatesFromContent(note.content)}`;
-
-		btn1.addEventListener("click", () => {
-			openEditNote(note.id);
-		});
-		btn1.innerText = "Edit";
-		btn2.addEventListener("click", () => {
-			undoNote(note.id);
-		});
-		btn2.innerText = "Archive";
-
-		btn3.addEventListener("click", () => {
-			removeNotefromArchive(note.id);
-		});
-		btn3.innerText = "Remove";
-
-		const td7 = document.createElement("td");
-		td7.append(btn1);
-		td7.append(btn2);
-		td7.append(btn3);
-
-		row.append(td1);
-		row.append(td2);
-		row.append(td3);
-		row.append(td4);
-		row.append(td5);
-		row.append(td6);
-		row.append(td7);
+	const archive = notesData.filter((value) => {
+		return value.archived === true;
+	});
+	archive.forEach((note) => {
+		const row = createRow(note, true);
 		notesTableBody.appendChild(row);
 	});
+}
+
+function createRow(note, isArchive) {
+	const row = document.createElement("tr");
+
+	const btnEdit = document.createElement("button");
+	const btnArchive = document.createElement("button");
+	const btnRemove = document.createElement("button");
+
+	btnEdit.addEventListener("click", () => {
+		openEditNote(note.id);
+	});
+	btnEdit.setAttribute("data-bs-toggle", "modal");
+	btnEdit.setAttribute("data-bs-target", "#EditModal");
+	btnEdit.innerText = "Edit";
+
+	btnArchive.addEventListener("click", () => {
+		if (isArchive) {
+			undoNote(note.id);
+		} else {
+			archiveNote(note.id);
+		}
+	});
+	btnArchive.innerText = isArchive ? "Undo" : "Archive";
+
+	btnRemove.addEventListener("click", () => {
+		removeNote(note.id);
+	});
+	btnRemove.innerText = "Remove";
+
+	row.innerHTML = `
+    <td><img src=${note.img} style="width:30px;height:30px;"/></td>
+    <td>${note.name}</td>
+    <td>${note.createdAt.toLocaleDateString()}</td>
+    <td>${note.content}</td>
+    <td>${note.category}</td>
+    <td>${getDatesFromContent(note.content)}</td>`;
+
+	const tdBtn = document.createElement("td");
+
+	tdBtn.append(btnEdit);
+	tdBtn.append(btnArchive);
+	tdBtn.append(btnRemove);
+
+	row.append(tdBtn);
+	return row;
 }
 
 // export Function to get dates mentioned in the note content
@@ -147,8 +90,8 @@ export function renderSummaryTable() {
 	];
 
 	categories.forEach((category) => {
-		const activeNotesCount = notesData.filter((note) => note.category === category.category).length;
-		const archivedNotesCount = archiveData.filter((note) => note.category === category.category).length;
+		const activeNotesCount = notesData.filter((note) => note.category === category.category && note.archived === false).length;
+		const archivedNotesCount = notesData.filter((note) => note.category === category.category && note.archived).length;
 
 		const row = document.createElement("tr");
 		row.innerHTML = `
